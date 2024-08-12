@@ -1,0 +1,51 @@
+.pane {
+    height: 100%;
+    background: #fff;
+    border-style: solid;
+    border-color: #E6E6E6;
+    border-width: px;
+    border-radius: 0px;
+    box-shadow: 2px 2px 2px #E6E6E6;
+}
+
+
+.header {
+    background-color: #A9E44C;
+    margin: 5px;
+    padding-left: 10px;
+    padding-top: 4px;
+    border-radius: 3px;
+    height: 30px;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.full-height-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column; 
+  }
+  
+.tab-content .tab-pane{
+    height: calc(100vh - (30px));
+}
+
+.nav-link{
+    height: 30px;
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+    color: rgb(33, 37, 41);
+}
+
+
+.nav-link:hover {
+   color: #A9E44C;
+   background-color: #111111;
+  }
+
+
+  
