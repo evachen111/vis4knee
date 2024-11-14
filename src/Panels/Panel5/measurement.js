@@ -3,12 +3,12 @@ import Plot from "react-plotly.js";
 
 
 
-function Measurements({ data, selectedData, onSelect }) {
-    console.log(selectedData)
-    const selectedPointIndex = selectedData ? parseInt(selectedData.pointIndex) : null;
+function Measurements({ data, selectedOne, onSelect }) {
+    const selectedPointIndex = selectedOne ? parseInt(selectedOne.pointIndex) : null;
   
     // Determine the color of the line based on selection
     const lineColor = selectedPointIndex !== null ? "red" : "black";
+    console.log(selectedOne)
   
     return (
         <div className='pane'>

@@ -14,23 +14,12 @@ import Image from './Panels/Panel6/image';
 import * as d3 from 'd3'; // Assuming you're using d3 to fetch your CSV dataset
 
 function App() {
-  const [dataset, setDataset] = useState(null); // State to hold dataset
+  const [dataset, setDataset] = useState(null); 
   const [selectedPoints, setSelectedPoints] = useState([]);
   const defaultLayout = [28, 30, 42];
   const defaultRightA = [20, 48, 32];
   const defaultRightB = [60, 40];
-  const [selectedData, setSelectedData] = useState(null);
-
-  // Heatmap data for Panel1
-  const heatmapData = {
-    z: [
-      [1, 20, 30, 40],
-      [20, 1, 60, 80],
-      [30, 60, 1, 100],
-    ],
-    x: ["A", "B", "C", "D"],
-    y: ["W", "X", "Y", "Z"],
-  };
+  const [selectedOne, setSelectedOne] = useState(null);
 
   // Line chart data for Panel2
   const lineData = {
@@ -38,9 +27,8 @@ function App() {
     y: [10, 15, 13, 17],
   };
 
-  // Callback to update the selected data point
-  const handleDataSelect = (point) => {
-    setSelectedData(point);
+  const handleOneSelect = (point) => {
+    setSelectedOne(point);
   };
 
   useEffect(() => {
@@ -64,12 +52,12 @@ function App() {
 
 
   const handleSelection = async (points_data) => {
-    console.log("APP: raw event data");
-    console.log(points_data);
+    // console.log("APP: raw event data");
+    // console.log(points_data);
 
     const selection = points_data.points.map((point) => point.pointNumber);
-    console.log("APP: sent-in selectedPoints props");
-    console.log(selection);
+    // console.log("APP: sent-in selectedPoints props");
+    // console.log(selection);
 
     setSelectedPoints(selection);
   };
@@ -90,7 +78,7 @@ function App() {
 
         <Panel defaultSize={defaultLayout[1]}>
           <div style={{ height: '100%' }}>
-            <PreProcessing data={dataset} selectedData={selectedData} onSelect={handleDataSelect} />
+            <PreProcessing data={dataset} selectedOne={selectedOne} onSelect={handleOneSelect} />
           </div>
         </Panel>
 
@@ -100,7 +88,7 @@ function App() {
           <PanelGroup direction="vertical">
             <Panel defaultSize={defaultRightA[0]}>
               <div className="col-md-12 bg-light h-100">
-                <Metadata dataset={dataset} />
+                <Metadata dataset={dataset} selectedPoints={selectedPoints}/>
               </div>
             </Panel>
 
@@ -118,7 +106,7 @@ function App() {
               <PanelGroup direction="horizontal">
                 <Panel defaultSize={defaultRightB[0]}>
                   <div className="col-md-12 bg-light h-100">
-                    <Measurements data={lineData} selectedData={selectedData} onSelect={handleDataSelect}/>
+                    <Measurements data={lineData} selectedOne={selectedOne} onSelect={handleOneSelect}/>
                   </div>
                 </Panel>
 

@@ -2,10 +2,10 @@
 // import Plot from "react-plotly.js";
 
 
-// function PreProcessing({ data, selectedData, onSelect }) {
+// function PreProcessing({ data, selectedOne, onSelect }) {
 //     // Determine color based on selected data
 //     const zColor = data.z.map((row, i) =>
-//       row.map((val, j) => (selectedData && selectedData.pointIndex === `${i}-${j}` ? "red" : "blue"))
+//       row.map((val, j) => (selectedOne && selectedOne.pointIndex === `${i}-${j}` ? "red" : "blue"))
 //     );
 //     // console.log(zColor)
   
@@ -44,42 +44,32 @@
 import React from "react";
 import Plot from "react-plotly.js";
 
-function PreProcessing({ data, selectedData, onSelect }) {
-  // Helper function to preprocess the data
+function PreProcessing({ data, selectedOne, onSelect }) {
+
   const preprocessData = (dataset) => {
-    // Get unique x (Body Style) and y (Drive Wheels) values
-    const xLabels = [...new Set(dataset.map((row) => row["body-style"]))];
-    const yLabels = [...new Set(dataset.map((row) => row["drive-wheels"]))];
+    // Get unique x/y values
+    // const xLabels = [...new Set(dataset.map((row) => row["body-style"]))]; 
+    // const yLabels = [...new Set(dataset.map((row) => row["drive-wheels"]))];
 
-    // Create a 2D array for z values (Horsepower)
-    const zValues = yLabels.map(() =>
-      Array(xLabels.length).fill(null)
+    const xLabels = [...Object.keys(dataset[0])]; 
+    const yLabels = [...dataset.map((_, index) => index)];
+
+
+    const zValues = yLabels.map((rowIndex) =>
+      xLabels.map((colName) => (dataset[rowIndex][colName] >1 ? 1 : 0))
     );
-
-    // Populate the zValues array with horsepower data
-    dataset.forEach((row) => {
-      const xIndex = xLabels.indexOf(row["body-style"]);
-      const yIndex = yLabels.indexOf(row["drive-wheels"]);
-      const horsepower = parseFloat(row["horsepower"]);
-      if (!isNaN(horsepower)) {
-        zValues[yIndex][xIndex] = horsepower;
-      }
-    });
 
     return { x: xLabels, y: yLabels, z: zValues };
   };
 
-  // Preprocess the data
   const processedData = preprocessData(data);
 
-  // Determine color based on selected data
   const zColor = processedData.z.map((row, i) =>
     row.map((val, j) =>
-      selectedData && selectedData.pointIndex === `${i}-${j}` ? "red" : "blue"
+      selectedOne && selectedOne.pointIndex === `${i}-${j}` ? "red" : "blue"
     )
   );
 
-  // Plotly heatmap configuration
   return (
     <div className="pane">
       <div className="header">PreProcessing</div>
@@ -98,13 +88,11 @@ function PreProcessing({ data, selectedData, onSelect }) {
         layout={{
           width: 500,
           height: 500,
-          xaxis: { title: "Body Style" },
-          yaxis: { title: "Drive Wheels" },
         }}
         onClick={(event) => {
-          const { pointNumber } = event.points[0];
-          const pointIndex = `${pointNumber[1]}-${pointNumber[0]}`; // In heatmap, x is column (index 1), y is row (index 0)
-          onSelect({ pointIndex });
+          const pointIndex = event.points[0].pointIndex[0];
+          // onSelect({ pointIndex }); //an object with a key-value pair ({ pointIndex: value }).
+          onSelect(pointIndex);
         }}
       />
     </div>

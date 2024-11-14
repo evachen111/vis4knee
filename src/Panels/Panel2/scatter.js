@@ -47,36 +47,34 @@ function Scatter({ dataset, selectedPoints, handleSelection }) {
 
     // Define updateColor function that uses the current selectedPoints
     const updateColor = (points_data) => {
-      console.log("selected points of Scatter")
-      console.log(points_data)
+      // console.log("selected points of Scatter")
+      // console.log(points_data) // get an array of indices of the points
       const new_color = new Int8Array(mpg.length);
       for (let i = 0; i < points_data.length; i++) {
         new_color[points_data[i]] = 1;
         //new_color[points_data[i]] = 'firebrick';
       }
-      console.log("Color of Scatter")
-      console.log(new_color)
+      // console.log("Color of Scatter")
+      // console.log(new_color)
       Plotly.restyle(gd, {'marker.color': [new_color]}, 0);
     };
 
-    // Update colors whenever selectedPoints changes
+    // update colors whenever selectedPoints changes
     if (selectedPoints && selectedPoints.length > 0) {
       updateColor(selectedPoints);
     }
 
-    // Event listener for selection
+    // event listener for selection
     const handlePlotlySelect = async (eventData) => {
       if (eventData && eventData.points) {
-        // Call handleSelection with the new points
-        await handleSelection(eventData);
+        await handleSelection(eventData); // send eventData
         // No need to call updateColor here - it will happen on next render
       }
     };
 
-    // Attach event listener
+    // event listener
     gd.on("plotly_selected", handlePlotlySelect);
 
-    // Cleanup function
     return () => {
       gd.removeAllListeners("plotly_selected");
     };

@@ -1,60 +1,129 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 
-function Metadata({ dataset }) {
-  const chartRef = useRef(null);
-  const [tableData, setTableData] = useState([]);
+function Metadata({ dataset, selectedPoints }) {
+  const tableRef = useRef(null);
 
-  // Preprocess the data into a format suitable for a table
-  const preprocessData = (carsData) => {
-    const categoricalDimensionLabels = ["body-style", "drive-wheels", "fuel-type"];
-    const mpg = carsData.map((row) => row["highway-mpg"]);
-    const horsepower = carsData.map((row) => row["horsepower"]);
+  // Extract col names from the first row
+  const columns = dataset.length > 0 ? Object.keys(dataset[0]) : [];
+  // console.log(selectedPoints)
 
-    // Combine all data into an array of objects
-    const combinedData = carsData.map((row, index) => ({
-      "Highway MPG": mpg[index],
-      Horsepower: horsepower[index],
-      "Body Style": row["body-style"],
-      "Drive Wheels": row["drive-wheels"],
-      "Fuel Type": row["fuel-type"],
-    }));
-
-    return combinedData;
-  };
-
-  // Update table data when dataset changes
-  useEffect(() => {
-    if (dataset && dataset.length > 0) {
-      const data = preprocessData(dataset);
-      setTableData(data);
-    }
-  }, [dataset]);
+  const selectRows = dataset.filter((_, rowIndex) =>
+    selectedPoints.includes(rowIndex)
+  );
+  const unselectRows = dataset.filter(
+    (_, rowIndex) => !selectedPoints.includes(rowIndex)
+  );
+  // console.log("selected rows:")
+  // console.log(selectRows)
+  const combineData = [...selectRows, ...unselectRows];
 
   return (
     <div className="pane">
       <div className="header">Metadata</div>
-      <div id="graph" ref={chartRef} style={{ overflowY: "scroll", height: "300px" }}>
+      <div
+        ref={tableRef}
+        style={{
+          overflow: "auto",
+          maxHeight: "100%",
+          maxWidth: "100%",
+          border: "1px solid #ccc",
+        }}
+      >
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Highway MPG</th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Horsepower</th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Body Style</th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Drive Wheels</th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Fuel Type</th>
+              {columns.map((colName) => (
+                <th
+                  key={colName}
+                  style={{
+                    position: "sticky",
+                    top: 0,
+                    backgroundColor: "white",
+                    padding: "8px",
+                    border: "1px solid #ddd",
+                  }}
+                >
+                  {colName}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {tableData.map((row, index) => (
-              <tr key={index}>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>{row["Highway MPG"]}</td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>{row.Horsepower}</td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>{row["Body Style"]}</td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>{row["Drive Wheels"]}</td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>{row["Fuel Type"]}</td>
-              </tr>
-            ))}
+            {/* {selectRows.map((row, rowIndex) => { //put selectedPoints at the top
+              return(
+              <tr key={rowIndex}
+                style = {{
+                  backgroundColor: "#f0f0f0",
+                }}>
+                {columns.map((colName) => (
+                  <td
+                    key={colName}
+                    style={{
+                      padding: "8px",
+                      border: "1px solid #ddd",
+                      textAlign: "left",
+                    }}
+                  >
+                    {row[colName] != null ? row[colName] : ""}
+                  </td>
+                ))}
+              </tr>);
+            })}
+            {unselectRows.map((row, rowIndex) => {
+              return(
+              <tr key={rowIndex}
+                style = {{
+                  backgroundColor: "white",
+                }}>
+                {columns.map((colName) => (
+                  <td
+                    key={colName}
+                    style={{
+                      padding: "8px",
+                      border: "1px solid #ddd",
+                      textAlign: "left",
+                    }}
+                  >
+                    {row[colName] != null ? row[colName] : ""}
+                  </td>
+                ))}
+              </tr>);
+            })} */}
+
+            {dataset
+              .slice() // shallow copy to avoid mutating the original dataset
+              .sort((a, b) => {
+                const aSelected = selectedPoints.includes(dataset.indexOf(a));
+                const bSelected = selectedPoints.includes(dataset.indexOf(b));
+                return aSelected === bSelected ? 0 : aSelected ? -1 : 1;
+              })
+              .map((row, rowIndex) => {
+                const isSelected = selectedPoints.includes(
+                  dataset.indexOf(row)
+                );
+                return (
+                  <tr
+                    key={rowIndex}
+                    style={{
+                      backgroundColor: isSelected ? "#f0f0f0" : "white",
+                    }}
+                  >
+                    {columns.map((colName) => (
+                      <td
+                        key={colName}
+                        style={{
+                          padding: "8px",
+                          border: "1px solid #ddd",
+                          textAlign: "left",
+                        }}
+                      >
+                        {row[colName] != null ? row[colName] : ""}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
           </tbody>
         </table>
       </div>
