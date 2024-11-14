@@ -1,148 +1,136 @@
-import "./App.css";
+import React, { useState, useEffect } from 'react';
+import './App.css';
 import {
-  getPanelElement,
-  getPanelGroupElement,
-  getResizeHandleElement,
   Panel,
   PanelGroup,
   PanelResizeHandle,
-} from "react-resizable-panels";
-import Profile from "./Panels/Panel1";
-import Scatter from "./Panels/Panel2";
-import Metadata from "./Panels/Panel3";
-import Demographics from "./Panels/Panel4";
-import Measurements from "./Panels/Panel5";
-import Image from "./Panels/Panel6";
-import "./App.css";
+} from 'react-resizable-panels';
+import Demographics from './Panels/Panel4/demographics';
+import PreProcessing from './Panels/Panel7/preprocessing';
+import Metadata from './Panels/Panel3/metadata';
+import Scatter from './Panels/Panel2/scatter';
+import Measurements from './Panels/Panel5/measurement';
+import Image from './Panels/Panel6/image';
+import * as d3 from 'd3'; // Assuming you're using d3 to fetch your CSV dataset
 
 function App() {
-  const defaultLayout = [33, 67];
-  const defaultLeft = [20, 40, 40];
-  const defaultRight = [45, 55];
-  const defaultRightB = [57, 43];
+  const [dataset, setDataset] = useState(null); // State to hold dataset
+  const [selectedPoints, setSelectedPoints] = useState([]);
+  const defaultLayout = [28, 30, 42];
+  const defaultRightA = [20, 48, 32];
+  const defaultRightB = [60, 40];
+  const [selectedData, setSelectedData] = useState(null);
+
+  // Heatmap data for Panel1
+  const heatmapData = {
+    z: [
+      [1, 20, 30, 40],
+      [20, 1, 60, 80],
+      [30, 60, 1, 100],
+    ],
+    x: ["A", "B", "C", "D"],
+    y: ["W", "X", "Y", "Z"],
+  };
+
+  // Line chart data for Panel2
+  const lineData = {
+    x: [1, 2, 3, 4],
+    y: [10, 15, 13, 17],
+  };
+
+  // Callback to update the selected data point
+  const handleDataSelect = (point) => {
+    setSelectedData(point);
+  };
+
+  useEffect(() => {
+    // Fetch the dataset only once when the App component is mounted
+    const fetchData = async () => {
+      try {
+        const data = await d3.csv('https://raw.githubusercontent.com/plotly/datasets/master/imports-85.csv');
+        setDataset(data); // Store dataset in state
+      } catch (error) {
+        console.error('Error fetching dataset:', error);
+      }
+    };
+
+    fetchData();
+  }, []); // Empty dependency array ensures this runs once on mount
+
+  // If the dataset is not loaded yet, show a loading message
+  if (!dataset) {
+    return <div>Loading...</div>;
+  }
+
+
+  const handleSelection = async (points_data) => {
+    console.log("APP: raw event data");
+    console.log(points_data);
+
+    const selection = points_data.points.map((point) => point.pointNumber);
+    console.log("APP: sent-in selectedPoints props");
+    console.log(selection);
+
+    setSelectedPoints(selection);
+  };
+
+
+
+
   return (
     <div className="App h-100">
       <PanelGroup direction="horizontal">
         <Panel defaultSize={defaultLayout[0]}>
-          <PanelGroup direction="vertical">
-            <Panel defaultSize={defaultLeft[0]} maxSize={75}>
-              <div style={{ height: "100%" }}>
-                <Profile />
-              </div>
-            </Panel>
-            <PanelResizeHandle />
-            <Panel defaultSize={defaultLeft[1]} maxSize={75}>
-              <div style={{ height: "100%" }}>
-                <Scatter />
-              </div>
-            </Panel>
-            <PanelResizeHandle />
-            <Panel defaultSize={defaultLeft[2]} maxSize={75}>
-              <div style={{ height: "100%" }}>
-                <Metadata />
-              </div>
-            </Panel>
-          </PanelGroup>
+          <div style={{ height: '100%' }}>
+            <Demographics dataset={dataset} selectedPoints={selectedPoints} handleSelection={handleSelection}/>
+          </div>
         </Panel>
+
         <PanelResizeHandle />
+
         <Panel defaultSize={defaultLayout[1]}>
-          <div className="full-height-container">
-          <nav>
-            <div class="nav nav-tabs" id="nav-tab" role="tablist">
-              <button
-                class="nav-link active"
-                id="nav-home-tab"
-                data-bs-toggle="tab"
-                data-bs-target="#nav-home"
-                type="button"
-                role="tab"
-                aria-controls="nav-home"
-                aria-selected="true"
-              >
-                Preprocessing
-              </button>
-              <button
-                class="nav-link"
-                id="nav-profile-tab"
-                data-bs-toggle="tab"
-                data-bs-target="#nav-profile"
-                type="button"
-                role="tab"
-                aria-controls="nav-profile"
-                aria-selected="false"
-              >
-                Analysis
-              </button>
-            </div>
-          </nav>
-          <div class="tab-content" id="nav-tabContent">
-            <div
-              class="tab-pane fade show active"
-              id="nav-home"
-              role="tabpanel"
-              aria-labelledby="nav-home-tab"
-            >
-              xxx
-            </div>
-            <div
-              class="tab-pane fade"
-              id="nav-profile"
-              role="tabpanel"
-              aria-labelledby="nav-profile-tab"
-            >
-              <PanelGroup className = "new" direction="vertical">
-                <Panel defaultSize={defaultRight[0]}>
-                <div style={{ height: "100%" }}>
-                    <Demographics />
-                  </div>
-                </Panel>
-                <PanelResizeHandle />
-                <Panel defaultSize={defaultRight[1]}>
-                  <PanelGroup direction="horizontal">
-                    <Panel defaultSize={defaultRightB[0]}>
-                    <div style={{ height: "100%" }}>
-                        <Measurements />
-                      </div>
-                    </Panel>
-                    <PanelResizeHandle />
-                    <Panel defaultSize={defaultRightB[1]}>
-                    <div style={{ height: "100%" }}>
-                        <Image />
-                      </div>
-                    </Panel>
-                  </PanelGroup>
-                </Panel>
-              </PanelGroup>
-            </div>
+          <div style={{ height: '100%' }}>
+            <PreProcessing data={dataset} selectedData={selectedData} onSelect={handleDataSelect} />
           </div>
-          </div>
+        </Panel>
 
+        <PanelResizeHandle />
 
-{/*           
-        <PanelGroup direction="vertical">
-            <Panel>
+        <Panel defaultSize={defaultLayout[2]}>
+          <PanelGroup direction="vertical">
+            <Panel defaultSize={defaultRightA[0]}>
               <div className="col-md-12 bg-light h-100">
-                <Demographics />
+                <Metadata dataset={dataset} />
               </div>
             </Panel>
+
             <PanelResizeHandle />
-            <Panel>
+
+            <Panel defaultSize={defaultRightA[1]}>
+              <div style={{ height: '100%' }}>
+                <Scatter dataset={dataset} selectedPoints={selectedPoints} handleSelection={handleSelection}/>
+              </div>
+            </Panel>
+
+            <PanelResizeHandle />
+
+            <Panel defaultSize={defaultRightA[2]}>
               <PanelGroup direction="horizontal">
-                <Panel>
+                <Panel defaultSize={defaultRightB[0]}>
                   <div className="col-md-12 bg-light h-100">
-                    <Measurements />
+                    <Measurements data={lineData} selectedData={selectedData} onSelect={handleDataSelect}/>
                   </div>
                 </Panel>
+
                 <PanelResizeHandle />
-                <Panel>
+                <Panel defaultSize={defaultRightB[1]}>
                   <div className="col-md-12 bg-light h-100">
                     <Image />
                   </div>
                 </Panel>
               </PanelGroup>
             </Panel>
-          </PanelGroup> */}
-
+          </PanelGroup>
         </Panel>
       </PanelGroup>
     </div>
