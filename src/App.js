@@ -70,7 +70,7 @@ function App() {
       <PanelGroup direction="horizontal">
         <Panel defaultSize={defaultLayout[0]}>
           <div style={{ height: '100%' }}>
-            <Demographics dataset={dataset} selectedPoints={selectedPoints} handleSelection={handleSelection}/>
+            <Demographics dataset={dataset} selectedPoints={selectedPoints} handleSelection={handleSelection} selectedOne={selectedOne}/>
           </div>
         </Panel>
 
@@ -88,7 +88,7 @@ function App() {
           <PanelGroup direction="vertical">
             <Panel defaultSize={defaultRightA[0]}>
               <div className="col-md-12 bg-light h-100">
-                <Metadata dataset={dataset} selectedPoints={selectedPoints}/>
+                <Metadata dataset={dataset} selectedPoints={selectedPoints} selectedOne={selectedOne} onSelect={handleOneSelect}/>
               </div>
             </Panel>
 
@@ -96,7 +96,7 @@ function App() {
 
             <Panel defaultSize={defaultRightA[1]}>
               <div style={{ height: '100%' }}>
-                <Scatter dataset={dataset} selectedPoints={selectedPoints} handleSelection={handleSelection}/>
+                <Scatter dataset={dataset} selectedPoints={selectedPoints} handleSelection={handleSelection} selectedOne={selectedOne}/>
               </div>
             </Panel>
 

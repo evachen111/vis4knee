@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useCallback } from "react";
 import Plotly from "plotly.js-dist";
 
-function Scatter({ dataset, selectedPoints, handleSelection }) {
+function Scatter({ dataset, selectedPoints, handleSelection, selectedOne }) {
   const chartRef = useRef(null);
   
   // Move preprocessData outside component to avoid recreating on each render
@@ -35,9 +35,18 @@ function Scatter({ dataset, selectedPoints, handleSelection }) {
         type: "scatter",
         x: horsepower,
         y: mpg,
-        marker: { color: "gray" },
+        marker: { 
+          color: "gray",
+          colorscale: [
+            [0,"gray"],
+            [1/2,"firebrick"], // by default
+            [1, "blue"]
+          ],
+          cmax:2,
+          cmin:0,
+         },
         mode: "markers",
-        selected: { marker: { color: "firebrick" } },
+        selected: { marker: { color: "firebrick" } }, // only affects the selection moment
         unselected: { marker: { opacity: 0.3 } },
       },
     ];
@@ -46,22 +55,32 @@ function Scatter({ dataset, selectedPoints, handleSelection }) {
     Plotly.newPlot(gd, traces, layout);
 
     // Define updateColor function that uses the current selectedPoints
-    const updateColor = (points_data) => {
+    const updateColor = (points_data, one_point) => {
       // console.log("selected points of Scatter")
       // console.log(points_data) // get an array of indices of the points
-      const new_color = new Int8Array(mpg.length);
+      const new_color = new Array(mpg.length).fill(0);
       for (let i = 0; i < points_data.length; i++) {
         new_color[points_data[i]] = 1;
         //new_color[points_data[i]] = 'firebrick';
       }
       // console.log("Color of Scatter")
       // console.log(new_color)
+      if (one_point){
+        // console.log("yes");
+        // console.log(one_point);
+        new_color[one_point] = 2;
+      }
+      // console.log(new Set(new_color));
       Plotly.restyle(gd, {'marker.color': [new_color]}, 0);
     };
 
     // update colors whenever selectedPoints changes
-    if (selectedPoints && selectedPoints.length > 0) {
-      updateColor(selectedPoints);
+    if (selectedPoints && selectedPoints.length > 0 && selectedOne) {
+      updateColor(selectedPoints, selectedOne);
+    }else if (selectedOne){
+      updateColor([], selectedOne);
+    }else if (selectedPoints && selectedPoints.length > 0){
+      updateColor(selectedPoints, null);
     }
 
     // event listener for selection
@@ -78,7 +97,7 @@ function Scatter({ dataset, selectedPoints, handleSelection }) {
     return () => {
       gd.removeAllListeners("plotly_selected");
     };
-  }, [dataset, handleSelection, selectedPoints]); // Include all dependencies
+  }, [dataset, handleSelection, selectedPoints, selectedOne]); // Include all dependencies
 
   return (
     <div className="pane">

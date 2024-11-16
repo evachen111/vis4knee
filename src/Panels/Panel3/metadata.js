@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 
-function Metadata({ dataset, selectedPoints }) {
+function Metadata({ dataset, selectedPoints, selectedOne, onSelect }) {
   const tableRef = useRef(null);
 
   // Extract col names from the first row
@@ -94,20 +94,39 @@ function Metadata({ dataset, selectedPoints }) {
             {dataset
               .slice() // shallow copy to avoid mutating the original dataset
               .sort((a, b) => {
-                const aSelected = selectedPoints.includes(dataset.indexOf(a));
-                const bSelected = selectedPoints.includes(dataset.indexOf(b));
+                const aIndex = dataset.indexOf(a);
+                const bIndex = dataset.indexOf(b);
+
+                // Check if a or b is the selectedOne
+                const aIsSelectedOne = aIndex === selectedOne;
+                const bIsSelectedOne = bIndex === selectedOne;
+
+                // If one of them is the selectedOne, push it to the top
+                if (aIsSelectedOne && !bIsSelectedOne) return -1;
+                if (bIsSelectedOne && !aIsSelectedOne) return 1;
+
+                // Otherwise, prioritize selectedPoints
+                const aSelected = selectedPoints.includes(aIndex);
+                const bSelected = selectedPoints.includes(bIndex);
                 return aSelected === bSelected ? 0 : aSelected ? -1 : 1;
               })
               .map((row, rowIndex) => {
-                const isSelected = selectedPoints.includes(
+                const areSelected = selectedPoints.includes(
                   dataset.indexOf(row)
                 );
+                const isHighlighted = selectedOne === dataset.indexOf(row);
                 return (
                   <tr
                     key={rowIndex}
                     style={{
-                      backgroundColor: isSelected ? "#f0f0f0" : "white",
+                      backgroundColor: isHighlighted
+                        ? "#e0ffe0"
+                        : areSelected
+                        ? "#f0f0f0"
+                        : "white",
+                      //cursor: "pointer",
                     }}
+                    onClick={() => onSelect(dataset.indexOf(row))}
                   >
                     {columns.map((colName) => (
                       <td

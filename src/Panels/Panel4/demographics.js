@@ -16,7 +16,7 @@ const preprocessData = (carsData) => {
   return { mpg, horsepower, categoricalDimensions };
 };
 
-function Demographics({ dataset, selectedPoints, handleSelection }) {
+function Demographics({ dataset, selectedPoints, handleSelection, selectedOne}) {
   const chartRef = useRef(null); // Create a ref for the chart div
   // console.log("Demo: props selectedPoints");
   // console.log(selectedPoints);
