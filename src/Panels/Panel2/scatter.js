@@ -3,10 +3,14 @@ import Plotly from "plotly.js-dist";
 
 function Scatter({ dataset, selectedPoints, handleSelection, selectedOne }) {
   const chartRef = useRef(null);
-  
+
   // Move preprocessData outside component to avoid recreating on each render
-  const categoricalDimensionLabels = ["body-style", "drive-wheels", "fuel-type"];
-  
+  const categoricalDimensionLabels = [
+    "body-style",
+    "drive-wheels",
+    "fuel-type",
+  ];
+
   const preprocessData = useCallback((carsData) => {
     const mpg = carsData.map((row) => row["highway-mpg"]);
     const horsepower = carsData.map((row) => row["horsepower"]);
@@ -16,6 +20,26 @@ function Scatter({ dataset, selectedPoints, handleSelection, selectedOne }) {
     });
     return { mpg, horsepower, categoricalDimensions };
   }, []);
+
+  // Define updateColor function that uses the current selectedPoints
+  const updateColor = (points_data, one_point) => {
+    // console.log("selected points of Scatter")
+    // console.log(points_data) // get an array of indices of the points
+    const new_color = new Array(dataset.length).fill(0);
+    for (let i = 0; i < points_data.length; i++) {
+      new_color[points_data[i]] = 1;
+      //new_color[points_data[i]] = 'firebrick';
+    }
+    // console.log("Color of Scatter")
+    // console.log(new_color)
+    if (one_point) {
+      // console.log("yes");
+      // console.log(one_point);
+      new_color[one_point] = 2;
+    }
+    // console.log(new Set(new_color));
+    Plotly.restyle("myScatter", { "marker.color": [new_color] }, 0);
+  };
 
   useEffect(() => {
     const gd = chartRef.current;
@@ -35,16 +59,16 @@ function Scatter({ dataset, selectedPoints, handleSelection, selectedOne }) {
         type: "scatter",
         x: horsepower,
         y: mpg,
-        marker: { 
+        marker: {
           color: "gray",
           colorscale: [
-            [0,"gray"],
-            [1/2,"firebrick"], // by default
-            [1, "blue"]
+            [0, "gray"],
+            [1 / 2, "firebrick"], // by default
+            [1, "blue"],
           ],
-          cmax:2,
-          cmin:0,
-         },
+          cmax: 2,
+          cmin: 0,
+        },
         mode: "markers",
         selected: { marker: { color: "firebrick" } }, // only affects the selection moment
         unselected: { marker: { opacity: 0.3 } },
@@ -54,32 +78,12 @@ function Scatter({ dataset, selectedPoints, handleSelection, selectedOne }) {
     // Initial plot creation
     Plotly.newPlot(gd, traces, layout);
 
-    // Define updateColor function that uses the current selectedPoints
-    const updateColor = (points_data, one_point) => {
-      // console.log("selected points of Scatter")
-      // console.log(points_data) // get an array of indices of the points
-      const new_color = new Array(mpg.length).fill(0);
-      for (let i = 0; i < points_data.length; i++) {
-        new_color[points_data[i]] = 1;
-        //new_color[points_data[i]] = 'firebrick';
-      }
-      // console.log("Color of Scatter")
-      // console.log(new_color)
-      if (one_point){
-        // console.log("yes");
-        // console.log(one_point);
-        new_color[one_point] = 2;
-      }
-      // console.log(new Set(new_color));
-      Plotly.restyle(gd, {'marker.color': [new_color]}, 0);
-    };
-
     // update colors whenever selectedPoints changes
     if (selectedPoints && selectedPoints.length > 0 && selectedOne) {
       updateColor(selectedPoints, selectedOne);
-    }else if (selectedOne){
+    } else if (selectedOne) {
       updateColor([], selectedOne);
-    }else if (selectedPoints && selectedPoints.length > 0){
+    } else if (selectedPoints && selectedPoints.length > 0) {
       updateColor(selectedPoints, null);
     }
 
@@ -102,7 +106,11 @@ function Scatter({ dataset, selectedPoints, handleSelection, selectedOne }) {
   return (
     <div className="pane">
       <div className="header">Scatter</div>
-      <div id="myScatter" ref={chartRef} style={{ width: "100%", height: "100%"}}></div>
+      <div
+        id="myScatter"
+        ref={chartRef}
+        style={{ width: "100%", height: "100%" }}
+      ></div>
     </div>
   );
 }

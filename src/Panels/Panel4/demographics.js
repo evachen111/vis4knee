@@ -16,21 +16,29 @@ const preprocessData = (carsData) => {
   return { mpg, horsepower, categoricalDimensions };
 };
 
-function Demographics({ dataset, selectedPoints, handleSelection, selectedOne}) {
+function Demographics({
+  dataset,
+  selectedPoints,
+  handleSelection,
+  selectedOne,
+}) {
   const chartRef = useRef(null); // Create a ref for the chart div
   // console.log("Demo: props selectedPoints");
   // console.log(selectedPoints);
 
   // Update color on selection
-  var updateColor = function (points_data) {
+  var updateColor = function (points_data, one_point) {
     // console.log("selected points of Demo")
     // console.log(points_data)
-    var new_color = new Int8Array(dataset.length);
+    var new_color = new Array(dataset.length).fill(0);
 
     for (var i = 0; i < points_data.length; i++) {
-      new_color[points_data[i]] = 1;
+      new_color[points_data[i]] = 0.5;
     }
 
+    if (one_point){
+      new_color[one_point] = 1;
+    }
     // Update selected points in scatter plot
     // console.log("Color of Demo")
     // console.log(new_color)
@@ -48,11 +56,10 @@ function Demographics({ dataset, selectedPoints, handleSelection, selectedOne}) 
     const { categoricalDimensions } = preprocessData(dataset);
     // Fetch data and render the Plotly chart
 
-    // Initial color and colorscale
-    const color = new Int8Array(dataset.length);
     const colorscale = [
       [0, "gray"],
-      [1, "firebrick"],
+      [1 / 2, "firebrick"],
+      [1, "blue"],
     ];
 
     // Layout configuration
@@ -82,7 +89,7 @@ function Demographics({ dataset, selectedPoints, handleSelection, selectedOne}) 
           colorscale: colorscale,
           cmin: 0,
           cmax: 1,
-          color: color,
+          color: "gray",
           shape: "hspline",
         },
         // labelfont: { size: 14 },
@@ -92,8 +99,13 @@ function Demographics({ dataset, selectedPoints, handleSelection, selectedOne}) 
     // Create the Plotly plot
     Plotly.newPlot(gd, traces, layout);
 
-    if (selectedPoints && selectedPoints.length > 0) {
-      updateColor(selectedPoints);
+    // update colors whenever selectedPoints changes
+    if (selectedPoints && selectedPoints.length > 0 && selectedOne) {
+      updateColor(selectedPoints, selectedOne);
+    } else if (selectedOne) {
+      updateColor([], selectedOne);
+    } else if (selectedPoints && selectedPoints.length > 0) {
+      updateColor(selectedPoints, null);
     }
 
     // Add event listeners

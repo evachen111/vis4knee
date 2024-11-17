@@ -41,34 +41,51 @@
 //   }
   
 //   export default PreProcessing;
-import React from "react";
+import React, { useState } from "react";
 import Plot from "react-plotly.js";
 
 function PreProcessing({ data, selectedOne, onSelect }) {
 
   const preprocessData = (dataset) => {
-    // Get unique x/y values
-    // const xLabels = [...new Set(dataset.map((row) => row["body-style"]))]; 
-    // const yLabels = [...new Set(dataset.map((row) => row["drive-wheels"]))];
-
-    const xLabels = [...Object.keys(dataset[0])]; 
+    const xLabels = [...Object.keys(dataset[0])];
     const yLabels = [...dataset.map((_, index) => index)];
 
-
     const zValues = yLabels.map((rowIndex) =>
-      xLabels.map((colName) => (dataset[rowIndex][colName] >1 ? 1 : 0))
+      xLabels.map((colName) => (dataset[rowIndex][colName] > 1 ? 1 : 0))
     );
 
     return { x: xLabels, y: yLabels, z: zValues };
   };
 
   const processedData = preprocessData(data);
+  console.log(processedData.y[selectedOne]);
 
   const zColor = processedData.z.map((row, i) =>
     row.map((val, j) =>
       selectedOne && selectedOne.pointIndex === `${i}-${j}` ? "red" : "blue"
     )
   );
+
+  // Define the shape for the selected row
+  const selectedRowShape = selectedOne !== null
+    ? [
+        {
+          type: "rect",
+          xref: "x",
+          yref: "y",
+          // x0: processedData.x[0],
+          // x1: processedData.x[processedData.x.length - 1],
+          x0: -0.5,
+          x1: processedData.x.length-0.5,
+          y0: processedData.y[selectedOne] - 0.5,
+          y1: processedData.y[selectedOne] + 0.5,
+          line: {
+            color: "black",
+            width: 2,
+          },
+        },
+      ]
+    : [];
 
   return (
     <div className="pane">
@@ -87,7 +104,8 @@ function PreProcessing({ data, selectedOne, onSelect }) {
         ]}
         layout={{
           width: 500,
-          height: 500,
+          height: 800,
+          shapes: selectedRowShape,
         }}
         onClick={(event) => {
           const pointIndex = event.points[0].pointIndex[0];
