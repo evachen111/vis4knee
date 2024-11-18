@@ -35,7 +35,7 @@ function App() {
     // Fetch the dataset only once when the App component is mounted
     const fetchData = async () => {
       try {
-        const response = await fetch('/ZIB_demoFeatures_v00_507.csv'); // need to be in "/public/"
+        const response = await fetch('ZIB_demoFeatures_v00_507.csv'); // need to be in "/public/"
         const text = await response.text();
         const data = d3.csvParse(text);
         // console.log(data)

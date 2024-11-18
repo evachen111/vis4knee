@@ -8,7 +8,7 @@ function PreProcessing({ dataset, selectedOne, onSelect }) {
     const match = hoverText.match(/SUBJECT_ID:\s*(\d+)/);
     return match ? match[1] : null;
   };
-  
+
     // Find the y-axis index of the selected SUBJECT_ID
   const selectedRowIndex =
     selectedOne !== null && scatterData
@@ -114,7 +114,6 @@ function PreProcessing({ dataset, selectedOne, onSelect }) {
 
         if (dataIndex !== -1) {
           // Call onSelect with the found index
-          console.log(`Selected SUBJECT_ID: ${subjectId}, Index: ${dataIndex}`);
           onSelect(dataIndex);
         } else {
           console.warn(`SUBJECT_ID: ${subjectId} not found in dataset`);
