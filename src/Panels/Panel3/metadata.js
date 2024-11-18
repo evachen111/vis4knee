@@ -25,7 +25,7 @@ function Metadata({ dataset, selectedPoints, selectedOne, onSelect }) {
         ref={tableRef}
         style={{
           overflow: "auto",
-          maxHeight: "100%",
+          maxHeight: "90%",
           maxWidth: "100%",
           border: "1px solid #ccc",
         }}

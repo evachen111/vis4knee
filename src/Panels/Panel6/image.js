@@ -13,7 +13,7 @@ function Image() {
         trigger={
           <img
             src={image1}
-            style={{ width: "95%", height: "auto", margin: "5px", cursor: "pointer" }}
+            style={{ width: "95%", height: "90%", margin: "5px", cursor: "pointer" }}
             alt="3D Visualization"
           />
         }

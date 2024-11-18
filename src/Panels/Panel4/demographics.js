@@ -2,15 +2,15 @@ import React, { useRef, useEffect } from "react";
 import Plotly from "plotly.js-dist";
 
 const preprocessData = (carsData) => {
-  const categoricalDimensionLabels = ["AGE", "SEX", "ETHNICITY", "BMI"];
+  const categoricalDimensionLabels = ["AGE", "SEX", "ETHNICITY", "BMI", "KLG"];
 
-  // Define quantiles for AGE and BMI
-  const quantilesAge = [0.2, 0.4, 0.6, 0.8];
-  const quantilesBMI = [0.2, 0.5, 0.75];
+  // Define the range boundaries for AGE and BMI
+  const ageRanges = [40, 50, 60, 70, 80];
+  const bmiRanges = [18.5, 24.9, 29.9, 34.9];
 
-  // Preprocess numerical features using quantiles
-  const ageValues = splitByQuantiles(carsData, "AGE", quantilesAge);
-  const bmiValues = splitByQuantiles(carsData, "BMI", quantilesBMI);
+  // Preprocess the AGE and BMI columns by ranges
+  const ageValues = splitByRange(carsData, "AGE", ageRanges);
+  const bmiValues = splitByRange(carsData, "BMI", bmiRanges);
 
   // Handle categorical dimensions
   const categoricalDimensions = categoricalDimensionLabels.map((dimLabel) => {
@@ -28,31 +28,24 @@ const preprocessData = (carsData) => {
   return { categoricalDimensions };
 };
 
-const splitByQuantiles = (data, column, quantiles) => {
+const splitByRange = (data, column, ranges) => {
   const values = data.map((row) => parseFloat(row[column]));
-  values.sort((a, b) => a - b);
 
-  // Define quantile thresholds
-  const thresholds = quantiles.length > 0 ? quantiles : [0.25, 0.5, 0.75];
-  const quantileBins = [];
+  const rangeBins = [];
   const binLabels = [];
 
-  for (let i = 0; i < thresholds.length; i++) {
-    const lower = i === 0 ? Math.min(...values) : values[Math.floor(thresholds[i - 1] * values.length)];
-    const upper = values[Math.floor(thresholds[i] * values.length)];
-    quantileBins.push([lower, upper]);
-    binLabels.push(`${column}: ${lower.toFixed(1)} ~ ${upper.toFixed(1)}`);
+  // Create bins based on ranges
+  for (let i = 0; i < ranges.length - 1; i++) {
+    const lower = ranges[i];
+    const upper = ranges[i + 1];
+    rangeBins.push([lower, upper]);
+    binLabels.push(`${column}: ${lower} ~ ${upper}`);
   }
-
-  // Add the last bin (greater than the last quantile)
-  const lastBin = [values[Math.floor(thresholds[thresholds.length - 1] * values.length)], Math.max(...values)];
-  quantileBins.push(lastBin);
-  binLabels.push(`${column}: ${lastBin[0].toFixed(1)} ~ ${lastBin[1].toFixed(1)}`);
 
   // Map each value to its corresponding bin label
   const categorizedValues = values.map((value) => {
-    for (let i = 0; i < quantileBins.length; i++) {
-      if (value >= quantileBins[i][0] && value <= quantileBins[i][1]) {
+    for (let i = 0; i < rangeBins.length; i++) {
+      if (value >= rangeBins[i][0] && value <= rangeBins[i][1]) {
         return binLabels[i];
       }
     }
@@ -82,7 +75,7 @@ function Demographics({
       new_color[points_data[i]] = 0.5;
     }
 
-    if (one_point){
+    if (one_point) {
       new_color[one_point] = 1;
     }
     // Update selected points in scatter plot
@@ -92,6 +85,7 @@ function Demographics({
   };
 
   const handlePlotClick = async (eventData) => {
+    // console.log(eventData)
     // Update the parent component with the clicked point
     await handleSelection(eventData);
   };
@@ -110,16 +104,16 @@ function Demographics({
 
     // Layout configuration
     const layout = {
-      width: 800,
-      // height: 900,
+      width: 900,
+      height: 530,
       yaxis: {
         // automargin: true,
-        title: "Horsepower",
+        tickangle: 45,
       },
       xaxis: {
         // domain: [0.6, 1],
         // automargin: true,
-        title: "MPG",
+        tickangle: 45,
       },
       dragmode: "lasso",
       hovermode: "closest",
@@ -129,7 +123,7 @@ function Demographics({
     const traces = [
       {
         type: "parcats",
-        domain: { y: [0.22, 0.78] },
+        // domain: { y: [0.22, 0.78] },
         dimensions: categoricalDimensions,
         line: {
           colorscale: colorscale,
@@ -139,6 +133,7 @@ function Demographics({
           shape: "hspline",
         },
         // labelfont: { size: 14 },
+        textangle: 90,
       },
     ];
 
@@ -167,10 +162,16 @@ function Demographics({
     <div className="pane">
       <div className="header">Demographics</div>
       <div
-        id="myDemo"
-        ref={chartRef}
-        style={{ width: "100%", height: "100%", marginTop: "-190px" }}
-      ></div>
+          id="myDemo"
+          ref={chartRef}
+          style={{
+            overflow: "visable",
+            maxHeight: "100%",
+            maxWidth: "100%",
+            marginTop: "40px",
+            border: "0px solid #ccc",
+          }}
+        ></div>
     </div>
   );
 }

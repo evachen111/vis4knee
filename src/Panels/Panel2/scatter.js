@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import Plotly from "plotly.js-dist";
+import { AlignCenter } from "lucide-react";
 
 function Scatter({ dataset, selectedPoints, handleSelection, selectedOne }) {
   const [pcaData, setPcaData] = useState({ pca1: [], pca2: [] });
@@ -46,11 +47,11 @@ function Scatter({ dataset, selectedPoints, handleSelection, selectedOne }) {
     const gd = chartRef.current;
     
     const layout = {
-      width: 600,
-      height: 600,
-      xaxis: { title: "PCA1" },
+      width: 550,
+      height: 500,
+      xaxis: { title: "PCA1", },
       yaxis: { 
-        domain: [0.7, 1], 
+        domain: [0.5, 1], 
         title: "PCA2" },
       dragmode: "lasso",
       hovermode: "closest",
@@ -107,11 +108,11 @@ function Scatter({ dataset, selectedPoints, handleSelection, selectedOne }) {
 
   return (
     <div className="pane">
-      <div className="header">Scatter</div>
+      <div className="header">Projection</div>
       <div
         id="myScatter"
         ref={chartRef}
-        style={{ width: "100%", height: "100%" }}
+        style={{ maxWidth: "100%", maxHeight: "90%", marginTop: "-5px", overflow:"auto" }}
       ></div>
     </div>
   );
