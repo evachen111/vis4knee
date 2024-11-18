@@ -1,24 +1,23 @@
-import React, { useRef, useEffect, useCallback } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Plotly from "plotly.js-dist";
 
 function Scatter({ dataset, selectedPoints, handleSelection, selectedOne }) {
+  const [pcaData, setPcaData] = useState({ pca1: [], pca2: [] });
   const chartRef = useRef(null);
 
-  // Move preprocessData outside component to avoid recreating on each render
-  const categoricalDimensionLabels = [
-    "body-style",
-    "drive-wheels",
-    "fuel-type",
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('pca_data.json');
+        const data = await response.json();
+        setPcaData(data);
+      } catch (error) {
+        console.error("Error loading PCA data:", error);
+      }
+    };
 
-  const preprocessData = useCallback((carsData) => {
-    const mpg = carsData.map((row) => row["highway-mpg"]);
-    const horsepower = carsData.map((row) => row["horsepower"]);
-    const categoricalDimensions = categoricalDimensionLabels.map((dimLabel) => {
-      const values = carsData.map((row) => row[dimLabel]);
-      return { values, label: dimLabel };
-    });
-    return { mpg, horsepower, categoricalDimensions };
+    fetchData();
+    // console.log(pcaData)
   }, []);
 
   // Define updateColor function that uses the current selectedPoints
@@ -43,15 +42,14 @@ function Scatter({ dataset, selectedPoints, handleSelection, selectedOne }) {
 
   useEffect(() => {
     const gd = chartRef.current;
-    const { mpg, horsepower } = preprocessData(dataset);
 
     const layout = {
       width: 600,
       height: 600,
-      xaxis: { title: "Horsepower" },
+      xaxis: { title: "PCA1" },
       yaxis: { 
         domain: [0.6, 1], 
-        title: "asd" },
+        title: "PCA2" },
       dragmode: "lasso",
       hovermode: "closest",
     };
@@ -59,8 +57,8 @@ function Scatter({ dataset, selectedPoints, handleSelection, selectedOne }) {
     const traces = [
       {
         type: "scatter",
-        x: horsepower,
-        y: mpg,
+        x: pcaData.pca1,
+        y: pcaData.pca2,
         marker: {
           color: "gray",
           colorscale: [
