@@ -17,7 +17,7 @@ function App() {
   const [dataset, setDataset] = useState(null); 
   const [selectedPoints, setSelectedPoints] = useState([]);
   const defaultLayout = [28, 30, 42];
-  const defaultRightA = [35, 38, 37];
+  const defaultRightA = [30, 30, 40];
   const defaultRightB = [60, 40];
   const [selectedOne, setSelectedOne] = useState(null);
 

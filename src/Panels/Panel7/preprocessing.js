@@ -1,117 +1,84 @@
-// import React, { Component } from 'react';
-// import Plot from "react-plotly.js";
-
-
-// function PreProcessing({ data, selectedOne, onSelect }) {
-//     // Determine color based on selected data
-//     const zColor = data.z.map((row, i) =>
-//       row.map((val, j) => (selectedOne && selectedOne.pointIndex === `${i}-${j}` ? "red" : "blue"))
-//     );
-//     // console.log(zColor)
-  
-//     // Plotly heatmap configuration
-//     return (
-//         <div className='pane'>
-//             <div className='header'>PreProcessing</div>
-//             {/* <PieChart data={data} width={width} height={height} /> */}
-//             <Plot
-//         data={[
-//           {
-//             z: data.z,
-//             x: data.x,
-//             y: data.y,
-//             type: "heatmap",
-//             colorscale: zColor,
-//             showscale: true,
-//             hoverinfo: "x+y+z",
-//           },
-//         ]}
-//         layout={{
-//           width: 400,
-//           height: 400,
-//         }}
-//         onClick={(event) => {
-//             console.log(event.points[0].pointNumber)
-//           const pointIndex = `${event.points[0].pointNumber[0]}-${event.points[0].pointNumber[1]}`; //e.g. [1,2]: 1-2
-//           onSelect({ pointIndex });
-//         }}
-//       />
-//         </div>
-//     )
-//   }
-  
-//   export default PreProcessing;
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Plot from "react-plotly.js";
 
-function PreProcessing({ data, selectedOne, onSelect }) {
+function PreProcessing({ selectedOne, onSelect }) {
+  const [scatterData, setScatterData] = useState(null);
 
-  const preprocessData = (dataset) => {
-    const xLabels = [...Object.keys(dataset[0])];
-    const yLabels = [...dataset.map((_, index) => index)];
+  // Fetch scatter data from JSON file
+  useEffect(() => {
+    fetch("heatmap_data.json")
+      .then((response) => response.json())
+      .then((jsonData) => setScatterData(jsonData))
+      .catch((error) => console.error("Error fetching scatter data:", error));
+  }, []);
 
-    const zValues = yLabels.map((rowIndex) =>
-      xLabels.map((colName) => (dataset[rowIndex][colName] > 1 ? 1 : 0))
-    );
-
-    return { x: xLabels, y: yLabels, z: zValues };
-  };
-
-  const processedData = preprocessData(data);
-
-  const zColor = processedData.z.map((row, i) =>
-    row.map((val, j) =>
-      selectedOne && selectedOne.pointIndex === `${i}-${j}` ? "red" : "blue"
-    )
-  );
-
-  // Define the shape for the selected row
-  const selectedRowShape = selectedOne !== null
-    ? [
-        {
-          type: "rect",
-          xref: "x",
-          yref: "y",
-          // x0: processedData.x[0],
-          // x1: processedData.x[processedData.x.length - 1],
-          x0: -0.5,
-          x1: processedData.x.length-0.5,
-          y0: processedData.y[selectedOne] - 0.5,
-          y1: processedData.y[selectedOne] + 0.5,
-          line: {
-            color: "black",
-            width: 2,
-          },
-        },
-      ]
-    : [];
-
+  // Plotly scatter plot configuration
   return (
     <div className="pane">
       <div className="header">PreProcessing</div>
-      <Plot
-        data={[
-          {
-            z: processedData.z,
-            x: processedData.x,
-            y: processedData.y,
-            type: "heatmap",
-            colorscale: "red",
-            showscale: true,
-            hoverinfo: "x+y+z",
-          },
-        ]}
-        layout={{
-          width: 500,
-          height: 800,
-          shapes: selectedRowShape,
-        }}
-        onClick={(event) => {
-          const pointIndex = event.points[0].pointIndex[0];
-          // onSelect({ pointIndex }); //an object with a key-value pair ({ pointIndex: value }).
-          onSelect(pointIndex);
-        }}
-      />
+      {scatterData? (
+        <div className="scroll-container">
+  <Plot
+    data={[
+      {
+        x: scatterData.x,
+        y: scatterData.y,
+        text: scatterData.text,
+        mode: "markers",
+        marker: {
+          color: scatterData.color,
+          size: scatterData.size,
+          symbol: scatterData.symbols,
+          colorscale: [
+            [0, "white"], [0.0625, "black"],
+            [0.3125, "white"], [0.375, "#d8c187"],
+            [0.625, "white"], [0.6875, "#9bc1bc"],
+            [0.9375, "white"], [1.0, "#bc9bc1"]
+          ],
+          showscale: false,
+        },
+        hoverinfo: "text",
+      },
+    ]}
+    layout={{
+      showlegend: false,
+      width: 25*scatterData.column_names.length,
+      height: 20*scatterData.subject_ids.length,
+      // width: 800,
+      // height: 11000,
+      xaxis: {
+        tickvals: scatterData.column_names.map((_, index) => index),
+        ticktext: scatterData.column_names,
+        tickfont: {
+          size: 10
+        },
+        side: "top",
+        tickangle: 45,
+        showgrid: false,
+        zeroline: false,
+        range: [-0.5, scatterData.column_names.length - 0.5],
+      },
+      yaxis: {
+        tickvals: scatterData.subject_ids.map((_, index) => index),
+        ticktext: scatterData.subject_ids,
+        tickfont: {
+          size: 10
+        },
+        showticklabels: true,
+        showgrid: false,
+        zeroline: false,
+        range: [-0.5, scatterData.subject_ids.length - 0.5],
+      },
+    }}
+    onClick={(event) => {
+      const pointIndex = event.points[0].pointIndex;
+      onSelect(pointIndex);
+    }}
+  />
+</div>
+      ) : (
+        <div>Loading scatter plot data...</div>
+      )}
     </div>
   );
 }

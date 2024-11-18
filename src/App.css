@@ -45,9 +45,20 @@ html, body, #root {
 .nav-link:hover {
    color: #A9E44C;
    background-color: #111111;
-  }
+}
 
 
-  div#myDemo {
+div#myDemo {
     transform: rotate(0.25turn); 
-   }
+}
+
+th,td {
+     font-size: 12px;
+}
+
+.scroll-container {
+    overflow: auto;
+    max-height: 100vh; /* Controls how much height the plot occupies before scrolling */
+    padding: 10px;
+    margin-top: 20px;
+  }

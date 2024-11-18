@@ -40,7 +40,7 @@ function Metadata({ dataset, selectedPoints, selectedOne, onSelect }) {
                     position: "sticky",
                     top: 0,
                     backgroundColor: "white",
-                    padding: "5px",
+                    padding: "6px",
                     border: "1px solid #ddd",
                   }}
                 >
@@ -132,7 +132,7 @@ function Metadata({ dataset, selectedPoints, selectedOne, onSelect }) {
                       <td
                         key={colName}
                         style={{
-                          padding: "8px",
+                          padding: "6px",
                           border: "1px solid #ddd",
                           textAlign: "left",
                         }}
