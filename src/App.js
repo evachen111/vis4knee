@@ -81,7 +81,7 @@ function App() {
 
         <Panel defaultSize={defaultLayout[1]}>
           <div style={{ height: '100%' }}>
-            <PreProcessing data={dataset} selectedOne={selectedOne} onSelect={handleOneSelect} />
+            <PreProcessing dataset={dataset} selectedOne={selectedOne} onSelect={handleOneSelect} />
           </div>
         </Panel>
 

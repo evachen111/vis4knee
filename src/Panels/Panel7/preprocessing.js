@@ -1,8 +1,41 @@
 import React, { useEffect, useState } from "react";
 import Plot from "react-plotly.js";
 
-function PreProcessing({ selectedOne, onSelect }) {
+function PreProcessing({ dataset, selectedOne, onSelect }) {
   const [scatterData, setScatterData] = useState(null);
+
+  const extractSubjectId = (hoverText) => {
+    const match = hoverText.match(/SUBJECT_ID:\s*(\d+)/);
+    return match ? match[1] : null;
+  };
+  
+    // Find the y-axis index of the selected SUBJECT_ID
+  const selectedRowIndex =
+    selectedOne !== null && scatterData
+      ? scatterData.subject_ids.findIndex(
+          (id) => id.toString() === dataset[selectedOne]?.SUBJECT_ID.toString()
+        )
+      : null;
+
+  // Define the shape for the selected row
+  const selectedRowShape =
+    selectedRowIndex !== null
+      ? [
+          {
+            type: "rect",
+            xref: "x",
+            yref: "y",
+            x0: -0.5,
+            x1: scatterData.column_names.length - 0.5,
+            y0: selectedRowIndex - 0.5,
+            y1: selectedRowIndex + 0.5,
+            line: {
+              color: "black",
+              width: 2,
+            },
+          },
+        ]
+      : [];
 
   // Fetch scatter data from JSON file
   useEffect(() => {
@@ -12,7 +45,6 @@ function PreProcessing({ selectedOne, onSelect }) {
       .catch((error) => console.error("Error fetching scatter data:", error));
   }, []);
 
-  // Plotly scatter plot configuration
   return (
     <div className="pane">
       <div className="header">PreProcessing</div>
@@ -44,8 +76,7 @@ function PreProcessing({ selectedOne, onSelect }) {
       showlegend: false,
       width: 25*scatterData.column_names.length,
       height: 20*scatterData.subject_ids.length,
-      // width: 800,
-      // height: 11000,
+      shapes: selectedRowShape,
       xaxis: {
         tickvals: scatterData.column_names.map((_, index) => index),
         ticktext: scatterData.column_names,
@@ -71,8 +102,26 @@ function PreProcessing({ selectedOne, onSelect }) {
       },
     }}
     onClick={(event) => {
-      const pointIndex = event.points[0].pointIndex;
-      onSelect(pointIndex);
+      // Extract SUBJECT_ID from the hover text of the clicked point
+      const hoverText = event.points[0].text;
+      const subjectId = extractSubjectId(hoverText);
+
+      if (subjectId) {
+        // Find the index of the data in the dataset with this SUBJECT_ID
+        const dataIndex = dataset.findIndex(
+          (data) => data.SUBJECT_ID.toString() === subjectId
+        );
+
+        if (dataIndex !== -1) {
+          // Call onSelect with the found index
+          console.log(`Selected SUBJECT_ID: ${subjectId}, Index: ${dataIndex}`);
+          onSelect(dataIndex);
+        } else {
+          console.warn(`SUBJECT_ID: ${subjectId} not found in dataset`);
+        }
+      } else {
+        console.warn("Could not extract SUBJECT_ID from hover text");
+      }
     }}
   />
 </div>
