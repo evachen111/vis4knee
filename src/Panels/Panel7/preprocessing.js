@@ -58,7 +58,6 @@ function PreProcessing({ data, selectedOne, onSelect }) {
   };
 
   const processedData = preprocessData(data);
-  console.log(processedData.y[selectedOne]);
 
   const zColor = processedData.z.map((row, i) =>
     row.map((val, j) =>

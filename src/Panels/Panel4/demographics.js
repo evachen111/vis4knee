@@ -2,18 +2,64 @@ import React, { useRef, useEffect } from "react";
 import Plotly from "plotly.js-dist";
 
 const preprocessData = (carsData) => {
-  const categoricalDimensionLabels = [
-    "body-style",
-    "drive-wheels",
-    "fuel-type",
-  ];
-  const mpg = carsData.map((row) => row["highway-mpg"]);
-  const horsepower = carsData.map((row) => row["horsepower"]);
+  const categoricalDimensionLabels = ["AGE", "SEX", "ETHNICITY", "BMI"];
+
+  // Define quantiles for AGE and BMI
+  const quantilesAge = [0.2, 0.4, 0.6, 0.8];
+  const quantilesBMI = [0.2, 0.5, 0.75];
+
+  // Preprocess numerical features using quantiles
+  const ageValues = splitByQuantiles(carsData, "AGE", quantilesAge);
+  const bmiValues = splitByQuantiles(carsData, "BMI", quantilesBMI);
+
+  // Handle categorical dimensions
   const categoricalDimensions = categoricalDimensionLabels.map((dimLabel) => {
-    const values = carsData.map((row) => row[dimLabel]);
+    let values;
+    if (dimLabel === "AGE") {
+      values = ageValues;
+    } else if (dimLabel === "BMI") {
+      values = bmiValues;
+    } else {
+      values = carsData.map((row) => row[dimLabel]);
+    }
     return { values, label: dimLabel };
   });
-  return { mpg, horsepower, categoricalDimensions };
+
+  return { categoricalDimensions };
+};
+
+const splitByQuantiles = (data, column, quantiles) => {
+  const values = data.map((row) => parseFloat(row[column]));
+  values.sort((a, b) => a - b);
+
+  // Define quantile thresholds
+  const thresholds = quantiles.length > 0 ? quantiles : [0.25, 0.5, 0.75];
+  const quantileBins = [];
+  const binLabels = [];
+
+  for (let i = 0; i < thresholds.length; i++) {
+    const lower = i === 0 ? Math.min(...values) : values[Math.floor(thresholds[i - 1] * values.length)];
+    const upper = values[Math.floor(thresholds[i] * values.length)];
+    quantileBins.push([lower, upper]);
+    binLabels.push(`${column}: ${lower.toFixed(1)} ~ ${upper.toFixed(1)}`);
+  }
+
+  // Add the last bin (greater than the last quantile)
+  const lastBin = [values[Math.floor(thresholds[thresholds.length - 1] * values.length)], Math.max(...values)];
+  quantileBins.push(lastBin);
+  binLabels.push(`${column}: ${lastBin[0].toFixed(1)} ~ ${lastBin[1].toFixed(1)}`);
+
+  // Map each value to its corresponding bin label
+  const categorizedValues = values.map((value) => {
+    for (let i = 0; i < quantileBins.length; i++) {
+      if (value >= quantileBins[i][0] && value <= quantileBins[i][1]) {
+        return binLabels[i];
+      }
+    }
+    return binLabels[binLabels.length - 1]; // Default to last bin
+  });
+
+  return categorizedValues;
 };
 
 function Demographics({

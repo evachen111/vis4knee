@@ -49,7 +49,9 @@ function Scatter({ dataset, selectedPoints, handleSelection, selectedOne }) {
       width: 600,
       height: 600,
       xaxis: { title: "Horsepower" },
-      yaxis: { domain: [0.6, 1], title: "MPG" },
+      yaxis: { 
+        domain: [0.6, 1], 
+        title: "asd" },
       dragmode: "lasso",
       hovermode: "closest",
     };

@@ -35,7 +35,10 @@ function App() {
     // Fetch the dataset only once when the App component is mounted
     const fetchData = async () => {
       try {
-        const data = await d3.csv('https://raw.githubusercontent.com/plotly/datasets/master/imports-85.csv');
+        const response = await fetch('/ZIB_demoFeatures_v00_507.csv'); // need to be in "/public/"
+        const text = await response.text();
+        const data = d3.csvParse(text);
+        // console.log(data)
         setDataset(data); // Store dataset in state
       } catch (error) {
         console.error('Error fetching dataset:', error);
