@@ -40,7 +40,7 @@ function Metadata({ dataset, selectedPoints, selectedOne, onSelect }) {
                     position: "sticky",
                     top: 0,
                     backgroundColor: "white",
-                    padding: "8px",
+                    padding: "5px",
                     border: "1px solid #ddd",
                   }}
                 >

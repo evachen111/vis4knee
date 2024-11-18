@@ -41,14 +41,16 @@ function Scatter({ dataset, selectedPoints, handleSelection, selectedOne }) {
   };
 
   useEffect(() => {
+    // console.log(pcaData)
+    // if (pcaData.pca1.length === 0 || pcaData.pca2.length === 0) return;
     const gd = chartRef.current;
-
+    
     const layout = {
       width: 600,
       height: 600,
       xaxis: { title: "PCA1" },
       yaxis: { 
-        domain: [0.6, 1], 
+        domain: [0.7, 1], 
         title: "PCA2" },
       dragmode: "lasso",
       hovermode: "closest",
@@ -101,7 +103,7 @@ function Scatter({ dataset, selectedPoints, handleSelection, selectedOne }) {
     return () => {
       gd.removeAllListeners("plotly_selected");
     };
-  }, [dataset, handleSelection, selectedPoints, selectedOne]); // Include all dependencies
+  }, [dataset, handleSelection, selectedPoints, selectedOne, pcaData]); // Include all dependencies
 
   return (
     <div className="pane">
