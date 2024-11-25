@@ -39,11 +39,15 @@ html, body, #root {
     height: 30px;
     padding-top: 0.01rem;
     padding-bottom: 0.01rem;
+    padding-top: 0.01rem;
+    padding-bottom: 0.01rem;
     color: rgb(33, 37, 41);
 }
 
 
 .nav-link:hover {
+   /* color: #A9E44C; */
+   color: white;
    /* color: #A9E44C; */
    color: white;
    background-color: #111111;
