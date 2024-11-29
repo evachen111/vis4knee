@@ -22,11 +22,7 @@ function App() {
   const defaultRightB = [60, 40];
   const [selectedOne, setSelectedOne] = useState(null);
 
-  // Line chart data for Panel2
-  const lineData = {
-    x: [1, 2, 3, 4],
-    y: [10, 15, 13, 17],
-  };
+  const API_BASE_URL = 'http://127.0.0.1:5000/';
 
   const handleOneSelect = (point) => {
     setSelectedOne(point);
@@ -43,10 +39,11 @@ function App() {
     // Fetch the dataset only once when the App component is mounted
     const fetchData = async () => {
       try {
-        const response = await fetch('ZIB_demoFeatures_v00_507.csv'); // need to be in "/public/"
-        const text = await response.text();
-        const data = d3.csvParse(text);
-        // console.log(data)
+        //const response = await fetch('ZIB_demoFeatures_v00_507.csv'); // need to be in "/public/"
+        // const text = await response.text();
+        // const data = d3.csvParse(text); 
+        const response = await fetch(`${API_BASE_URL}/data`);
+        const data = await response.json();
         setDataset(data); // Store dataset in state
       } catch (error) {
         console.error('Error fetching dataset:', error);
@@ -118,7 +115,7 @@ function App() {
               <PanelGroup direction="horizontal">
                 <Panel defaultSize={defaultRightB[0]}>
                   <div className="col-md-12 bg-light h-100">
-                    <Measurements data={lineData} selectedOne={selectedOne} onSelect={handleOneSelect}/>
+                    <Measurements data={dataset} selectedOne={selectedOne} onSelect={handleOneSelect}/>
                   </div>
                 </Panel>
 

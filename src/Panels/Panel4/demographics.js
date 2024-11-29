@@ -3,18 +3,11 @@ import Plotly from "plotly.js-dist";
 
 const preprocessData = (carsData) => {
   const categoricalDimensionLabels = ["AGE", "SEX", "ETHNICITY", "BMI", "KLG"];
-  const categoricalDimensionLabels = ["AGE", "SEX", "ETHNICITY", "BMI", "KLG"];
 
   // Define the range boundaries for AGE and BMI
   const ageRanges = [40, 50, 60, 70, 80];
   const bmiRanges = [18.5, 24.9, 29.9, 34.9];
-  // Define the range boundaries for AGE and BMI
-  const ageRanges = [40, 50, 60, 70, 80];
-  const bmiRanges = [18.5, 24.9, 29.9, 34.9];
 
-  // Preprocess the AGE and BMI columns by ranges
-  const ageValues = splitByRange(carsData, "AGE", ageRanges);
-  const bmiValues = splitByRange(carsData, "BMI", bmiRanges);
   // Preprocess the AGE and BMI columns by ranges
   const ageValues = splitByRange(carsData, "AGE", ageRanges);
   const bmiValues = splitByRange(carsData, "BMI", bmiRanges);
@@ -36,7 +29,6 @@ const preprocessData = (carsData) => {
 };
 
 const splitByRange = (data, column, ranges) => {
-const splitByRange = (data, column, ranges) => {
   const values = data.map((row) => parseFloat(row[column]));
 
   const rangeBins = [];
@@ -48,18 +40,10 @@ const splitByRange = (data, column, ranges) => {
     const upper = ranges[i + 1];
     rangeBins.push([lower, upper]);
     binLabels.push(`${column}: ${lower} ~ ${upper}`);
-  // Create bins based on ranges
-  for (let i = 0; i < ranges.length - 1; i++) {
-    const lower = ranges[i];
-    const upper = ranges[i + 1];
-    rangeBins.push([lower, upper]);
-    binLabels.push(`${column}: ${lower} ~ ${upper}`);
   }
 
   // Map each value to its corresponding bin label
   const categorizedValues = values.map((value) => {
-    for (let i = 0; i < rangeBins.length; i++) {
-      if (value >= rangeBins[i][0] && value <= rangeBins[i][1]) {
     for (let i = 0; i < rangeBins.length; i++) {
       if (value >= rangeBins[i][0] && value <= rangeBins[i][1]) {
         return binLabels[i];
@@ -102,7 +86,6 @@ function Demographics({
 
   const handlePlotClick = async (eventData) => {
     // console.log(eventData)
-    // console.log(eventData)
     // Update the parent component with the clicked point
     await handleSelection(eventData);
   };
@@ -126,12 +109,10 @@ function Demographics({
       yaxis: {
         // automargin: true,
         tickangle: 45,
-        tickangle: 45,
       },
       xaxis: {
         // domain: [0.6, 1],
         // automargin: true,
-        tickangle: 45,
         tickangle: 45,
       },
       dragmode: "lasso",
