@@ -104,8 +104,8 @@ function Demographics({
 
     // Layout configuration
     const layout = {
-      width: 900,
-      height: 530,
+      width: 650,
+      height: 430,
       yaxis: {
         // automargin: true,
         tickangle: 45,

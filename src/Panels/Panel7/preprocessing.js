@@ -74,8 +74,8 @@ function PreProcessing({ dataset, selectedOne, onSelect }) {
     ]}
     layout={{
       showlegend: false,
-      width: 25*scatterData.column_names.length,
-      height: 20*scatterData.subject_ids.length,
+      width: 20*scatterData.column_names.length,
+      height: 15*scatterData.subject_ids.length,
       shapes: selectedRowShape,
       xaxis: {
         tickvals: scatterData.column_names.map((_, index) => index),

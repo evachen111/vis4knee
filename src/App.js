@@ -18,7 +18,8 @@ function App() {
   const [dataset, setDataset] = useState(null); 
   const [selectedPoints, setSelectedPoints] = useState([]);
   const defaultLayout = [28, 30, 42];
-  const defaultRightA = [30, 30, 40];
+  const defaultMiddle = [20, 80];
+  const defaultRightA = [50, 50];
   const defaultRightB = [60, 40];
   const [selectedOne, setSelectedOne] = useState(null);
 
@@ -79,31 +80,35 @@ function App() {
       <PanelGroup direction="horizontal">
         <Panel defaultSize={defaultLayout[0]}>
           <div style={{ height: '100%' }}>
-            <Demographics dataset={dataset} selectedPoints={selectedPoints} handleSelection={handleSelection} selectedOne={selectedOne}/>
+          <PreProcessing dataset={dataset} selectedOne={selectedOne} onSelect={handleOneSelect} />
+           
           </div>
         </Panel>
 
         <PanelResizeHandle />
 
         <Panel defaultSize={defaultLayout[1]}>
-          <div style={{ height: '100%' }}>
-            <PreProcessing dataset={dataset} selectedOne={selectedOne} onSelect={handleOneSelect} />
-          </div>
+          <PanelGroup direction="vertical">
+          <Panel defaultSize={defaultMiddle[0]}>
+              <div className="col-md-12 bg-light h-100">
+                <Metadata dataset={dataset} selectedPoints={selectedPoints} selectedOne={selectedOne} onSelect={handleOneSelect}/>
+              </div>
+            </Panel>
+            <PanelResizeHandle />
+            <Panel defaultSize={defaultMiddle[1]}>
+            <div style={{ height: '100%' }}>
+              <Demographics dataset={dataset} selectedPoints={selectedPoints} handleSelection={handleSelection} selectedOne={selectedOne}/>
+            </div>
+            </Panel>
+          </PanelGroup> 
         </Panel>
 
         <PanelResizeHandle />
 
         <Panel defaultSize={defaultLayout[2]}>
           <PanelGroup direction="vertical">
+
             <Panel defaultSize={defaultRightA[0]}>
-              <div className="col-md-12 bg-light h-100">
-                <Metadata dataset={dataset} selectedPoints={selectedPoints} selectedOne={selectedOne} onSelect={handleOneSelect}/>
-              </div>
-            </Panel>
-
-            <PanelResizeHandle />
-
-            <Panel defaultSize={defaultRightA[1]}>
               <div style={{ height: '100%' }}>
                 <Scatter dataset={dataset} selectedPoints={selectedPoints} handleSelection={handleSelection} selectedOne={selectedOne}/>
               </div>
@@ -111,7 +116,7 @@ function App() {
 
             <PanelResizeHandle />
 
-            <Panel defaultSize={defaultRightA[2]}>
+            <Panel defaultSize={defaultRightA[1]}>
               <PanelGroup direction="horizontal">
                 <Panel defaultSize={defaultRightB[0]}>
                   <div className="col-md-12 bg-light h-100">
